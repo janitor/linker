@@ -29,3 +29,7 @@ func main() {
 	http.Handle("/", mongoSessionMiddleware(router))
 	http.ListenAndServe(":8000", nil)
 }
+
+func getShortedLink(linkCode string) string {
+	return config.AppProtocol + "://" + config.AppHost + "/g/" + linkCode
+}

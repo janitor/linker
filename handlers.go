@@ -5,12 +5,18 @@ import (
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
+	"time"
 )
 
 type Link struct {
 	ID   bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Link string        `json:"link"`
 	Code string        `json:"code"`
+}
+
+type Jump struct {
+	Link bson.ObjectId
+	Time time.Time
 }
 
 func LinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +64,11 @@ func GotoHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	}
 
+	jump := Jump{
+		Link: linkObj.ID,
+		Time: time.Now(),
+	}
+	insertIntoCollection(r, "jumps", jump)
+
 	http.Redirect(w, r, linkObj.Link, 302)
-
-	writeJSON(w, map[string]string{"linkCode": linkCode})
-}
-
-func getShortedLink(linkCode string) string {
-	return config.AppProtocol + "://" + config.AppHost + "/g/" + linkCode
 }
