@@ -1,0 +1,7 @@
+{
+  "MongoHost": "localhost",
+  "MongoDB": "linker",
+
+  "AppProtocol": "http",
+  "AppHost": "127.0.0.1:8000"
+}

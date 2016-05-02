@@ -1,16 +1,16 @@
 package main
 
 import (
-	"net/http"
-	"encoding/json"
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/asaskevich/govalidator"
+	"net/http"
 )
 
 type Link struct {
-	ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Link string `json:"link"`
+	ID   bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Link string        `json:"link"`
+	Code string        `json:"code"`
 }
 
 func LinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,9 +28,15 @@ func LinkHandler(w http.ResponseWriter, r *http.Request) {
 	var linkObj Link
 	linkObj.ID = bson.NewObjectId()
 	linkObj.Link = link
+	linkObj.Code = randStringBytes(10)
 
 	insertIntoCollection(r, "links", linkObj)
-	writeJSON(w, map[string]string{"link": link, "linkId": linkObj.ID.Hex()})
+
+	shortedLink := getShortedLink(linkObj.Code)
+	writeJSON(w, map[string]string{
+		"shortedLink": shortedLink,
+		"linkId":      linkObj.ID.Hex(),
+	})
 }
 
 func StatHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,12 +45,24 @@ func StatHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]string{"stat": linkId})
 }
 
-func writeJSON(w http.ResponseWriter, data interface{}) error {
-	jsn, err := json.Marshal(data)
+func GotoHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	linkCode := vars["linkCode"]
+
+	db := getMongoDBFromContext(r)
+	collection := db.C("links")
+
+	var linkObj Link
+	err := collection.Find(bson.M{"code": linkCode}).One(&linkObj)
 	if err != nil {
-		return err
+		http.NotFound(w, r)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsn)
-	return nil
+
+	http.Redirect(w, r, linkObj.Link, 302)
+
+	writeJSON(w, map[string]string{"linkCode": linkCode})
+}
+
+func getShortedLink(linkCode string) string {
+	return config.AppProtocol + "://" + config.AppHost + "/g/" + linkCode
 }
