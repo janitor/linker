@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+const MONGO_DB = "linker"
+
 var mongoSession *mgo.Session
 
 func mongoSessionMiddleware(h http.Handler) http.Handler {
@@ -13,7 +15,7 @@ func mongoSessionMiddleware(h http.Handler) http.Handler {
 		session := getMongoSession()
 		defer session.Close()
 		context.Set(r, CONTEXT_KEY_MONGO_SESSION, session)
-		context.Set(r, CONTEXT_KEY_MONGO_DB, session.DB(config.MongoDB))
+		context.Set(r, CONTEXT_KEY_MONGO_DB, session.DB(MONGO_DB))
 		h.ServeHTTP(w, r)
 	})
 }

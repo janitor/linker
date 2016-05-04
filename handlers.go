@@ -51,7 +51,7 @@ func StatHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]string{"stat": linkId})
 }
 
-func GotoHandler(w http.ResponseWriter, r *http.Request) {
+func JumpHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	linkCode := vars["linkCode"]
 
