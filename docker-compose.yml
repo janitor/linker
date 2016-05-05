@@ -1,0 +1,19 @@
+app:
+  build: .
+  ports:
+    - "8000:8000"
+  links:
+    - mongo
+
+mongo:
+  restart: always
+  image: mongo:latest
+  volumes_from:
+    - data
+
+data:
+  restart: always
+  image: mongo:latest
+  volumes:
+    - /var/lib/mongodb
+  command: "true"

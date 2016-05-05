@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"net/http"
 	"flag"
+	"fmt"
 )
 
 const CONTEXT_KEY_MONGO_SESSION = "mongo_session"
@@ -17,6 +18,7 @@ func init() {
 }
 
 func main() {
+	fmt.Println("Ok. Starting...")
 	session, err := mgo.Dial(config.MongoHost)
 	if err != nil {
 		panic(err)
@@ -32,7 +34,7 @@ func main() {
 	router.HandleFunc("/j/{linkCode}", JumpHandler)
 
 	http.Handle("/", mongoSessionMiddleware(router))
-	http.ListenAndServe(config.AppHost, nil)
+	http.ListenAndServe(":8000", nil)
 }
 
 func getShortedLink(linkCode string) string {
@@ -46,7 +48,7 @@ type Configuration struct {
 
 func parseOptions () {
 	mongoHost := flag.String("mongo-host", "localhost", "Mongo Host")
-	appHost := flag.String("app-host", "127.0.0.1:8000", "App host")
+	appHost := flag.String("app-host", "localhost:8000", "App host")
 
 	flag.Parse()
 
