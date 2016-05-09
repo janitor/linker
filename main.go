@@ -8,9 +8,6 @@ import (
 	"fmt"
 )
 
-const CONTEXT_KEY_MONGO_SESSION = "mongo_session"
-const CONTEXT_KEY_MONGO_DB = "mongo_db"
-
 var config *Configuration
 
 func init() {

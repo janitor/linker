@@ -8,6 +8,9 @@ import (
 
 const MONGO_DB = "linker"
 
+const CONTEXT_KEY_MONGO_SESSION = "mongo_session"
+const CONTEXT_KEY_MONGO_DB = "mongo_db"
+
 var mongoSession *mgo.Session
 
 func mongoSessionMiddleware(h http.Handler) http.Handler {
