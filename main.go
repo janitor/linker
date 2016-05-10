@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 	"net/http"
-	"flag"
-	"fmt"
 )
 
 var config *Configuration
@@ -40,10 +40,10 @@ func getShortedLink(linkCode string) string {
 
 type Configuration struct {
 	MongoHost string
-	AppHost     string
+	AppHost   string
 }
 
-func parseOptions () {
+func parseOptions() {
 	mongoHost := flag.String("mongo-host", "localhost", "Mongo Host")
 	appHost := flag.String("app-host", "localhost:8000", "App host")
 
@@ -51,7 +51,7 @@ func parseOptions () {
 
 	conf := Configuration{
 		MongoHost: *mongoHost,
-		AppHost: *appHost,
+		AppHost:   *appHost,
 	}
 	config = &conf
 }
