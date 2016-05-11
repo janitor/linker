@@ -19,6 +19,11 @@ type Jump struct {
 	Time time.Time
 }
 
+type LinkResponse struct {
+	ShortedLink string `json:"shortedLink"`
+	LinkId      string `json:"linkId"`
+}
+
 func LinkHandler(w http.ResponseWriter, r *http.Request) {
 
 	link := r.URL.Query().Get("link")
@@ -39,10 +44,12 @@ func LinkHandler(w http.ResponseWriter, r *http.Request) {
 	insertIntoCollection(r, "links", linkObj)
 
 	shortedLink := getShortedLink(linkObj.Code)
-	writeJSON(w, map[string]string{
-		"shortedLink": shortedLink,
-		"linkId":      linkObj.ID.Hex(),
-	})
+
+	response := LinkResponse{
+		ShortedLink: shortedLink,
+		LinkId:      linkObj.ID.Hex(),
+	}
+	writeJSON(w, response)
 }
 
 func StatHandler(w http.ResponseWriter, r *http.Request) {
