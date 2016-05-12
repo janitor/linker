@@ -26,3 +26,7 @@ func randStringBytes(n int) string {
 	}
 	return string(result)
 }
+
+func getShortedLink(linkCode string) string {
+	return config.AppHost + "/j/" + linkCode
+}

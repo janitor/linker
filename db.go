@@ -13,6 +13,19 @@ const CONTEXT_KEY_MONGO_DB = "mongo_db"
 
 var mongoSession *mgo.Session
 
+func initMongo() {
+	session, err := mgo.Dial(config.MongoHost)
+	if err != nil {
+		panic(err)
+	}
+	session.SetMode(mgo.Monotonic, true)
+	mongoSession = session
+}
+
+func closeMongo() {
+	mongoSession.Close()
+}
+
 func mongoSessionMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session := getMongoSession()

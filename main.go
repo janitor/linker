@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2"
 	"net/http"
 )
 
@@ -16,26 +15,20 @@ func init() {
 
 func main() {
 	fmt.Println("Ok. Starting...")
-	session, err := mgo.Dial(config.MongoHost)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	mongoSession = session
 
-	router := mux.NewRouter()
-	router.HandleFunc("/link", LinkHandler)
-	router.HandleFunc("/stat/{linkId}", StatHandler)
+	initMongo()
+	defer closeMongo()
 
-	router.HandleFunc("/j/{linkCode}", JumpHandler)
-
-	http.Handle("/", mongoSessionMiddleware(router))
+	http.Handle("/", getHandler())
 	http.ListenAndServe(":8000", nil)
 }
 
-func getShortedLink(linkCode string) string {
-	return "http://" + config.AppHost + "/j/" + linkCode
+func getHandler() http.Handler {
+	router := mux.NewRouter()
+	router.HandleFunc("/link", LinkHandler)
+	router.HandleFunc("/stat/{linkId}", StatHandler)
+	router.HandleFunc("/j/{linkCode}", JumpHandler)
+	return mongoSessionMiddleware(router)
 }
 
 type Configuration struct {
@@ -45,7 +38,7 @@ type Configuration struct {
 
 func parseOptions() {
 	mongoHost := flag.String("mongo-host", "localhost", "Mongo Host")
-	appHost := flag.String("app-host", "localhost:8000", "App host")
+	appHost := flag.String("app-host", "http://localhost:8000", "App host")
 
 	flag.Parse()
 
