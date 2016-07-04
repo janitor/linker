@@ -1,0 +1,6 @@
+language: go
+go:
+  - 1.6.2
+script: go test -args -mongo-host 127.0.0.1:27017
+services:
+  - mongodb
